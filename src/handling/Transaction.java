@@ -9,7 +9,6 @@ public class Transaction {
     private Date dueDate;
 
     public Transaction(handling.LibraryUser user, handling.Book book) {
-
         this.user = user;
         this.book = book;
         this.borrowDate = new Date();

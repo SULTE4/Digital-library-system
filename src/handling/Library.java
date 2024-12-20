@@ -7,7 +7,6 @@ public class Library {
     private List<handling.Book> books;
     private List<LibraryUser> users;
     private List<Transaction> transactions;
-
     public Library() {
         books = new ArrayList<>();
         users = new ArrayList<>();
