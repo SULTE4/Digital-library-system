@@ -17,4 +17,8 @@ public class LibraryUser {
     public void displayUser() {
         System.out.println("Name: " + name + ", UserID: " + userId);
     }
+
+    public String toString() {
+        return "Name: " + this.name + ", UserID: " + this.userId;
+    }
 }

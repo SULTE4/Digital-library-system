@@ -1,7 +1,11 @@
 package handling;
 
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.BufferedReader;
 
 public class Library {
     private List<handling.Book> books;
@@ -19,6 +23,43 @@ public class Library {
 
     public void addUser(LibraryUser user) {
         users.add(user);
+    }
+
+    public void loadBooksFromFile(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            // Skip the header line
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split("\\|");
+                if (parts.length == 3) {
+                    String title = parts[0];
+                    String author = parts[1];
+                    String isbn = parts[2];
+                    books.add(new Book(title, author, isbn));
+                }
+            }
+            System.out.println("Books loaded successfully.");
+        } catch (IOException e) {
+            System.out.println("An error occurred while loading books: " + e.getMessage());
+        }
+    }
+
+    public void loadUsersFromFile(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))){
+            String line;
+            while ((line = br.readLine()) != null){
+                String[] parts = line.split("\\,");
+                if (parts.length == 2) {
+                    String username = parts[0];
+                    String userID = parts[1];
+                    users.add(new LibraryUser(username, userID));
+                }
+            }
+            System.out.println("Users loaded successfully.");
+        } catch (IOException e) {
+            System.out.println("An error occurred while loading users: " + e.getMessage());
+        }
     }
 
     public void borrowBook(String isbn, String userId) {
@@ -72,8 +113,21 @@ public class Library {
         }
     }
 
-    public void displayBooks() {
+    public void displayUsers() {
+        for (LibraryUser user : users) {
+            System.out.println(user.toString());
+        }
+    }
+
+    public void displayBorrowedBooks() {
         for (handling.Book book : books) {
+            if (!book.isAvailable()) {
+                book.displayBook();
+            }
+        }
+    }
+    public void displayBooks() {
+        for(handling.Book book : books) {
             book.displayBook();
         }
     }
