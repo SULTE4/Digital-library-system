@@ -1,0 +1,81 @@
+import java.sql.Connection;
+import internal.utils.DBConnection;
+import internal.db.DBOperations;
+import internal.db.UsersOperations;
+import internal.db.BooksOperations;
+import internal.db.TransactionOperations;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        // Create instance of DBConnection to establish a connection
+        DBConnection dbConnection = new DBConnection();
+        Connection conn = dbConnection.getConnection("Data", "postgres", "1256");  // Provide database, user, and password
+
+       // Example delete entire books and users table
+        dbConnection.deleteTable(conn, "books");
+        dbConnection.deleteTable(conn, "users");
+        dbConnection.deleteTable(conn, "transactions");
+
+
+        if (conn != null) {
+            // Create tables if they don't exist
+            dbConnection.createTable(conn, "users");
+            dbConnection.createTable(conn, "books");
+            dbConnection.createTable(conn, "transactions");
+
+        }
+
+        // If connection is successful, proceed with DB operations
+        if (conn != null) {
+            // Create an instance of UsersOperations to perform user-related database operations
+            DBOperations userOperations = new UsersOperations();
+            DBOperations bookOperations = new BooksOperations();
+            TransactionOperations transactionOps = new TransactionOperations();
+
+            // Perform user-related operations
+            userOperations.insertRow(conn, "users", "Yertugan", "0");
+            userOperations.insertRow(conn, "users", "Tamerlan", "0");
+            userOperations.readData(conn, "users");
+
+            // Example update for users
+            userOperations.updateData(conn, "users", 1, Map.of("name", "Yertugan", "status","1"));  // Assuming empid 1 exists
+
+            // Example delete for users
+            userOperations.deleteRow(conn, "users", 2);  // Assuming empid 2 exists
+
+            userOperations.readData(conn, "users");
+
+            // Perform book-related operations with stock system in mind
+            bookOperations.insertRow(conn, "books", "1984", "George Orwell", "01", 5);  // Stock: 5 copies
+            bookOperations.insertRow(conn, "books", "Brave New World", "Aldous Huxley", "02", 3, 3);  // Stock: 3 copies
+            bookOperations.readData(conn, "books");
+
+            // Example update for books (Update stock count)
+            bookOperations.updateData(conn, "books", 1, Map.of("title", "1984 (Updated)", "stock", 1));  // Assuming id 1 exists
+
+            // Example delete for books
+//          bookOperations.deleteRow(conn, "books", 1);
+            bookOperations.readData(conn, "books");
+
+
+
+            transactionOps.borrowBook(conn, 1, 1);  // User 1 borrows Book 1
+            transactionOps.borrowBook(conn, 2, 2);  // User 2 borrows Book 2
+
+            bookOperations.readData(conn, "books");
+            // Print all transactions
+            transactionOps.printTransactions(conn);
+
+            // Return books
+            transactionOps.returnBook(conn, 1, 1);
+            transactionOps.returnBook(conn, 2, 2);
+
+            // Print transactions after returning
+            transactionOps.printTransactions(conn);
+
+        } else {
+            System.out.println("Connection failed. Cannot perform database operations.");
+        }
+    }
+}

@@ -1,25 +1,27 @@
-package handling;
+package internal;
+
+import internal.models.Book;
 
 import java.util.Date;
-
+//NO NEED
 public class Transaction {
-    private handling.LibraryUser user;
-    private handling.Book book;
+    private internal.models.LibraryUser user;
+    private Book book;
     private Date borrowDate;
     private Date dueDate;
 
-    public Transaction(handling.LibraryUser user, handling.Book book) {
+    public Transaction(internal.models.LibraryUser user, Book book) {
         this.user = user;
         this.book = book;
         this.borrowDate = new Date();
         this.dueDate = new Date(borrowDate.getTime() + 14L * 24 * 60 * 60 * 1000); // 14 days due
     }
 
-    public handling.Book getBook() {
+    public Book getBook() {
         return book;
     }
 
-    public handling.LibraryUser getUser() {
+    public internal.models.LibraryUser getUser() {
         return user;
     }
 

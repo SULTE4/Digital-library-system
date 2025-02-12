@@ -1,4 +1,4 @@
-package handling;
+package internal.models;
 
 public class Book {
     private String title;

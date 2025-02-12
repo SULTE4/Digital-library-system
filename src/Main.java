@@ -1,32 +1,50 @@
+import java.sql.Connection;
+import internal.utils.DBConnection;
+import internal.db.DBOperations;
+import internal.db.UsersOperations;
+import internal.db.BooksOperations;
+import internal.db.TransactionOperations;
+import internal.models.LibraryUser;
+import internal.models.LibraryAdmin;
+import internal.services.Library;
+import internal.services.LibraryServices;
+
 public class Main {
     public static void main(String[] args) {
-        handling.Library library = new handling.Library();
-        library.loadBooksFromFile("C:/Users/SULTE4/IdeaProjects/Digital-library-system//src/books.txt");
+        // Establish database connection
+        DBConnection dbConnection = new DBConnection();
+        Connection conn = dbConnection.getConnection("Data", "postgres", "1256");
 
-        library.addBook(new handling.Book("1984", "George Orwell", "00001"));
-        library.addBook(new handling.Book("The Great Gatsby", "F. Scott Fitzgerald", "00002"));
+        if (conn == null) {
+            System.out.println("Connection failed. Cannot perform database operations.");
+            return;
+        }
 
-        library.loadUsersFromFile("C:/Users/SULTE4/IdeaProjects/Digital-library-system/src/people_data.txt");
-        library.addUser(new handling.LibraryUser("Alice", "U001"));
-        library.addUser(new handling.LibraryUser("Bob", "U002"));
+        dbConnection.deleteTable(conn, "books");
+        dbConnection.deleteTable(conn, "users");
+        dbConnection.deleteTable(conn, "transactions");
 
-        library.displayUsers();
+        // Create tables
+        dbConnection.createTable(conn, "users");
+        dbConnection.createTable(conn, "books");
+        dbConnection.createTable(conn, "transactions");
 
-        System.out.println("\n--- Borrowing Book ---");
-        library.borrowBook("00001", "U001");
-        library.displayTransactions();
+        // Initialize database operations
+        DBOperations userOperations = new UsersOperations();
+        DBOperations bookOperations = new BooksOperations();
+        TransactionOperations transactionOps = new TransactionOperations();
 
+        // Create LibraryServices instance
+        LibraryServices libraryServices = new Library(conn, bookOperations, userOperations, transactionOps);
 
-        /*
-        System.out.println("\n--- Borrowed Books ---");
-        library.displayBorrowedBooks();
-*/
+        // Create admin and regular users
+        LibraryAdmin admin = new LibraryAdmin(1, "AdminUser", libraryServices);
+        LibraryUser user1 = new LibraryUser(2, "Yertugan", libraryServices);
+        LibraryUser user2 = new LibraryUser(3, "Tamerlan", libraryServices);
 
-        System.out.println("\n--- Returning Book ---");
-        library.returnBook("00001");
-        library.displayTransactions();
-
-        //library.displayBooks();
+        admin.addBook("1984", "George Orwell", "01", 5);
+        user1.borrowBook(1);
+        user1.returnBook(1);
+        admin.displayBooks();
     }
 }
-
